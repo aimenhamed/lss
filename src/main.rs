@@ -12,14 +12,17 @@ struct Args {
 
     #[clap(short, long, default_value = "false")]
     a: bool,
+
+    #[clap(short, long, default_value = "false")]
+    s: bool,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
     let entries = fs::read_dir(args.dir).expect("Failed to read directory");
 
-    println!("{}", format::get_header());
-    println!("-----------------------------------------------------------------------------------");
+    println!("{}", format::get_header(args.s));
+    println!("{}", format::get_delimiter(args.s));
 
     let mut count = 0;
     for entry in entries {
@@ -29,6 +32,7 @@ fn main() -> Result<()> {
                 if !args.a && name.starts_with('.') {
                     continue; // Skip hidden files when the -a flag is not provided
                 }
+
                 let metadata = entry.metadata().expect("Failed to get metadata");
                 let file_type = if metadata.is_dir() { "dir" } else { "file" };
                 let size = format::format_size(metadata.len());
@@ -43,6 +47,10 @@ fn main() -> Result<()> {
                 let is_dir = file_type == "dir";
                 let formatted_name = &format::format_name(name, is_dir, is_exec);
                 count += 1;
+                if args.s {
+                    println!("| {:2} | {} |", count, formatted_name);
+                    continue;
+                }
                 println!(
                     "| {:2} | {} | {:<4} | {:>8} | {:<15} | {} |",
                     count, formatted_name, file_type, size, modified, perms

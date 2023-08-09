@@ -46,9 +46,23 @@ pub fn format_name(name: &str, is_directory: bool, is_exec: bool) -> String {
     }
 }
 
-pub fn get_header() -> String {
+pub fn get_header(small: bool) -> String {
+    if small {
+        return format!("| {:2} | {:<30} |", "#", "name");
+    }
+
     return format!(
         "| {:2} | {:<30} | {:<4} | {:>8} | {:<15} | {} |",
         "#", "name", "type", "size", "modified", "perms"
+    );
+}
+
+pub fn get_delimiter(small: bool) -> String {
+    if small {
+        return String::from("---------------------------------------");
+    }
+
+    return String::from(
+        "-----------------------------------------------------------------------------------",
     );
 }
